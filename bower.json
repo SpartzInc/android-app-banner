@@ -1,0 +1,15 @@
+{
+  "name": "android-app-banner",
+  "version": "0.0.1",
+  "homepage": "https://github.com/SpartzInc/android-app-banner",
+  "authors": [
+    "Jon Rubins <jrubins@spartzinc.com>"
+  ],
+  "description": "An app banner for Android devices based on the popular jQuery Smart Banner project.",
+  "main": "jquery.smartbanner.js",
+  "keywords": [
+    "android",
+    "app-banner"
+  ],
+  "license": "MIT"
+}
