@@ -93,7 +93,7 @@
 
         create: function() {
             var iconURL,
-                link = this.options.url ? this.options.url : ('market://details?id=' + this.appId),
+                link = this.options.url ? this.options.url : ('http://play.google.com/store/apps/details?id=' + this.appId),
                 price = this.price || this.options.price,
                 inStore = price ? price + ' - ' + (this.options.inGooglePlay || '') : '';
 
