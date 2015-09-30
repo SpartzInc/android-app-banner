@@ -1,7 +1,7 @@
 #smartbanner {
     position: absolute;
     left: 0;
-    top: -82px;
+    top: 0;
     border-bottom: 1px solid #e8e8e8;
     width: 100%;
     height: 78px;
@@ -14,6 +14,10 @@
     -webkit-font-smoothing: antialiased;
     overflow: hidden;
     -webkit-text-size-adjust: none;
+}
+
+#smartbanner.animate {
+    top: -82px;
 }
 
 #smartbanner,
@@ -165,6 +169,7 @@ html.sb-animation {
     background: none;
     border-radius: 0;
     box-shadow: none;
+    min-height: 28px;
 }
 
 #smartbanner.android .sb-button span {

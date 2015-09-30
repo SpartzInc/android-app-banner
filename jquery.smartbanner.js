@@ -1,7 +1,7 @@
 /**
- * jQuery Smart Banner
- * Copyright (c) 2012 Arnold Daniels <arnold@jasny.net>
- * Based on 'jQuery Smart Web App Banner' by Kurt Zenisek @ kzeni.com
+ * jQuery Android App Banner
+ * Copyright (c) 2015 Spartz, Inc.
+ * Based on 'jQuery Smart Banner' by Arnold Daniels <arnold@jasny.net>
  */
 (function($) {
     var SmartBanner = function(options) {
@@ -25,7 +25,7 @@
         }
 
         // Calculate scale.
-        this.scale = this.options.scale == 'auto' ? $(window).width() / window.screen.width : this.options.scale;
+        this.scale = this.options.scale === 'auto' ? $(window).width() / window.screen.width : this.options.scale;
         if (this.scale < 1) {
             this.scale = 1;
         }
@@ -101,7 +101,8 @@
                 link = link + '&referrer=' + this.options.googlePlayParams;
             }
 
-            var banner = '<div id="smartbanner" class="android"><div class="sb-container">' +
+            var banner = '<div id="smartbanner" class="android' +
+                (this.options.animate ? ' animate' : '') + '"><div class="sb-container">' +
                 '<a href="#" class="sb-close">&times;</a><span class="sb-icon"></span>' +
                 '<div class="sb-info"><strong>' + this.title + '</strong><span>' + this.author +
                 '</span><span>' + inStore + '</span></div><a href="' + link +
@@ -111,6 +112,9 @@
             } else {
                 $(this.options.appendToSelector).prepend(banner);
             }
+
+            // Get a reference to our created Smart Banner element.
+            var $smartbanner = $('#smartbanner');
 
             if (this.options.icon) {
                 iconURL = this.options.icon;
@@ -123,25 +127,28 @@
             }
 
             if (iconURL) {
-                $('#smartbanner .sb-icon').css('background-image', 'url(' + iconURL + ')');
+                $smartbanner.find('.sb-icon').css('background-image', 'url(' + iconURL + ')');
             } else {
-                $('#smartbanner').addClass('no-icon');
+                $smartbanner.addClass('no-icon');
             }
 
-            this.bannerHeight = $('#smartbanner').outerHeight() + 2;
+            this.bannerHeight = $smartbanner.outerHeight() + 2;
 
             if (this.scale > 1) {
-                $('#smartbanner')
+               $smartbanner
                     .css('top', parseFloat($('#smartbanner').css('top')) * this.scale)
                     .css('height', parseFloat($('#smartbanner').css('height')) * this.scale)
                     .hide();
-                $('#smartbanner .sb-container')
+                $smartbanner.find('.sb-container')
                     .css('-webkit-transform', 'scale(' + this.scale + ')')
                     .css('-msie-transform', 'scale(' + this.scale + ')')
                     .css('-moz-transform', 'scale(' + this.scale + ')')
                     .css('width', $(window).width() / this.scale);
             }
-            $('#smartbanner').css('position', (this.options.layer) ? 'absolute' : 'static');
+            $smartbanner.css('position', (this.options.layer) ? 'absolute' : 'static');
+
+            // Call the user supplied onCreate method if supplied.
+            this.options.onCreate($smartbanner);
         },
 
         listen: function() {
@@ -151,6 +158,12 @@
 
         show: function(callback) {
             var banner = $('#smartbanner');
+
+            if (!this.options.animate) {
+                banner.show().addClass('shown');
+                return;
+            }
+
             banner.stop();
 
             if (this.options.layer) {
@@ -188,6 +201,12 @@
 
         hide: function(callback) {
             var banner = $('#smartbanner');
+
+            if (!this.options.animate) {
+                banner.hide().removeClass('shown');
+                return;
+            }
+
             banner.stop();
 
             if (this.options.layer) {
@@ -231,9 +250,9 @@
         },
 
         install: function(e) {
-			if (this.options.hideOnInstall) {
-				this.hide();
-			}
+            if (this.options.hideOnInstall) {
+                this.hide();
+            }
             this.setCookie('sb-installed', 'true', this.options.daysReminder);
             this.options.onInstall(e);
         },
@@ -255,7 +274,7 @@
                 x = ARRcookies[i].substr(0, ARRcookies[i].indexOf("="));
                 y = ARRcookies[i].substr(ARRcookies[i].indexOf("=") + 1);
                 x = x.replace(/^\s+|\s+$/g,"");
-                if (x == name) {
+                if (x === name) {
                     return decodeURI(y);
                 }
             }
@@ -280,12 +299,12 @@
     $.smartbanner = function(option) {
         var $window = $(window),
             data = $window.data('smartbanner'),
-            options = typeof option == 'object' && option;
+            options = typeof option === 'object' && option;
 
         if (!data) {
             $window.data('smartbanner', (data = new SmartBanner(options)));
         }
-        if (typeof option == 'string') {
+        if (typeof option === 'string') {
             data[option]();
         }
     };
@@ -301,6 +320,7 @@
         button: 'VIEW', // Text for the install button
         url: null, // The URL for the button. Keep null if you want the button to link to the app store.
         scale: 'auto', // Scale based on viewport size (set to 1 to disable)
+        animate: true, // Whether the showing / hiding of the app banner should be animated.
         speedIn: 300, // Show animation speed of the banner
         speedOut: 400, // Close animation speed of the banner
         daysHidden: 15, // Duration to hide the banner after being closed (0 = always show banner)
@@ -308,7 +328,7 @@
         hideOnInstall: true, // Hide the banner after "VIEW" is clicked.
         layer: false, // Display as overlay layer or slide down the page
         appendToSelector: 'body', //Append the banner to a specific selector
-		pushSelector: 'html' // What element is going to push the site content down; this is where the banner append animation will start.
+        pushSelector: 'html' // What element is going to push the site content down; this is where the banner append animation will start.
     };
 
     $.smartbanner.Constructor = SmartBanner;
@@ -337,8 +357,9 @@
         return false; // explicit for ie8 (  ._.)
     }
 
-    if ($.support.transition !== undefined)
+    if ($.support.transition !== undefined) {
         return; // Prevent conflict with Twitter Bootstrap
+    }
 
     // http://blog.alexmaccaw.com/css-transitions
     $.fn.emulateTransitionEnd = function(duration) {
@@ -347,7 +368,9 @@
             called = true;
         });
         var callback = function() {
-            if (!called) $($el).trigger($.support.transition.end);
+            if (!called) {
+                $($el).trigger($.support.transition.end);
+            }
         };
         setTimeout(callback, duration);
         return this;
